@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/shetul/nodejs/issues"
   },
-  "homepage": "https://github.com/shetul/nodejs#readme"
+  "homepage": "https://github.com/shetul/nodejs#readme",
+  "dependencies": {
+    "express": "^4.14.0"
+  }
 }
