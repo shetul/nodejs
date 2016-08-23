@@ -3,7 +3,7 @@ var controller = express.Router();
 var Runs = require('../models/runArray.js');
 
 controller.get('/', function(req, res){
-  res.json(runs);
+  res.json(Runs);
 });
 
 controller.get('/new',function(req, res){
@@ -21,10 +21,11 @@ controller.post('/', function(req, res){
   //runs.push(req.body);
   //res.send(runs);
   //res.send('post works');
-  Runs.create({
+  /*{
     date: new Date('2016-1-1'),
     distance: 5.5
-  }).then(function(createdRun){
+  }*/
+  Runs.create(req.body).then(function(createdRun){
     //createdRun is the object representation of the row created in the DB
     res.json(createdRun);
   });
