@@ -1,4 +1,4 @@
-module.exports = [
+/*module.exports = [
   {
     id: 1,
     distance: 0.1,
@@ -15,3 +15,12 @@ module.exports = [
     date: new Date('2016-3-1')
   },
 ];
+*/
+var Sequelize = require('sequelize');
+var db = require('../models/db_connection.js');
+
+var Run = db.define('run', { date:Sequelize.DATE, distance: Sequelize.FLOAT });
+
+db.sync();
+
+module.exports = Run;
