@@ -4,18 +4,14 @@ var Runs = require('../models/runArray.js');
 
 controller.get('/', function(req, res){
   Runs.findAll().then(function(totalRuns){
-    //createdRun is the object representation of the row created in the DB
     res.json(totalRuns);
   });
 });
 
-controller.get('/new',function(req, res){
-  res.send('show new page');
-});
-
 controller.get('/:id', function(req, res){
-  //res.send('Parameter id has value: ' + req.params.id);
-  res.json(runs[req.params.id]);
+  Runs.findById(req.params.id).then(function(foundRun){
+    res.json(foundRun);
+  });
 });
 
 controller.post('/', function(req, res){
@@ -39,9 +35,21 @@ controller.put('/:id', function(req, res){
   res.json(runs);
 });
 
-controller.delete('/:id', function(req, res){
+/*controller.delete('/:id', function(req, res){
   runs.splice(req.params.id, 1);
   res.json(runs);
+});*/
+
+controller.delete('/:id', function(req, res){
+  Runs.destroy({
+    where:{
+      id: req.params.id
+    }
+  }).then(function(didsucceed){
+    //createdRun is the object representation of the row created in the DB
+    res.json(didsucceed);
+  });
 });
+
 
 module.exports = controller;
