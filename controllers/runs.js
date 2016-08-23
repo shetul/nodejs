@@ -30,9 +30,22 @@ controller.post('/', function(req, res){
   });
 });
 
-controller.put('/:id', function(req, res){
+/*controller.put('/:id', function(req, res){
   runs[req.params.id] = req.body;
   res.json(runs);
+}); */
+
+controller.put('/:id', function(req, res){
+  Runs.update(
+    req.body,
+    {
+      where:{
+        id: req.params.id
+      }
+    }
+  ).then(function(didsucceed){
+      res.json(didsucceed);
+  });
 });
 
 /*controller.delete('/:id', function(req, res){
