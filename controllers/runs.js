@@ -2,18 +2,21 @@ var express = require('express');
 var controller = express.Router();
 var Runs = require('../models/runArray.js');
 
+// index
 controller.get('/', function(req, res){
   Runs.findAll().then(function(totalRuns){
     res.json(totalRuns);
   });
 });
 
+// show
 controller.get('/:id', function(req, res){
   Runs.findById(req.params.id).then(function(foundRun){
     res.json(foundRun);
   });
 });
 
+// create
 controller.post('/', function(req, res){
   //console.log(req.query);
   //res.send('show index page');
@@ -30,11 +33,7 @@ controller.post('/', function(req, res){
   });
 });
 
-/*controller.put('/:id', function(req, res){
-  runs[req.params.id] = req.body;
-  res.json(runs);
-}); */
-
+// update
 controller.put('/:id', function(req, res){
   Runs.update(
     req.body,
@@ -48,11 +47,7 @@ controller.put('/:id', function(req, res){
   });
 });
 
-/*controller.delete('/:id', function(req, res){
-  runs.splice(req.params.id, 1);
-  res.json(runs);
-});*/
-
+// destroy
 controller.delete('/:id', function(req, res){
   Runs.destroy({
     where:{
@@ -63,6 +58,5 @@ controller.delete('/:id', function(req, res){
     res.json(didsucceed);
   });
 });
-
 
 module.exports = controller;
