@@ -37,7 +37,7 @@ xScale.domain([new Date('2016-1-1'), new Date('2017-1-1')]);
 //console.log(xScale(new Date('2016-7-1')));
 
 var render = function(){ d3.json('/runs', function(error, data){
-  var circles = d3.select('svg').selectAll('circle').data(data, function(datum){
+  var circles = d3.select('#points').selectAll('circle').data(data, function(datum){
       return datum.id;
   });
   circles.enter()
@@ -97,9 +97,21 @@ var render = function(){ d3.json('/runs', function(error, data){
 
 render();
 
+var lastTransform = null;
+
 d3.select('svg').on('click', function(){
-  var distance = yScale.invert(d3.event.offsetY);
-  var date = xScale.invert(d3.event.offsetX);
+  var x = d3.event.offsetX;
+  var y = d3.event.offsetY;
+
+  if(lastTransform != null)
+  {
+    x = lastTransform.invertX(x);
+    y = lastTransform.invertY(y);
+  }
+
+  var distance = yScale.invert(y);
+  var date = xScale.invert(x);
+
   var runObject = {
     distance : distance,
     date : date
@@ -115,10 +127,23 @@ d3.select('svg').on('click', function(){
 var leftAxis = d3.axisLeft(yScale); //create a left axis based on the yScale
 d3.select('svg')
   .append('g') //append a group element
+  .attr('id', 'y-axis')
   .call(leftAxis); //apply the axis to it
 
 var bottomAxis = d3.axisBottom(xScale); //create a left axis based on the yScale
 d3.select('svg')
   .append('g') //append a group element
+//  .select('#xAx')
+  .attr('id', 'x-axis')
   .attr('transform', 'translate(0,'+HEIGHT+')')
   .call(bottomAxis); //apply the axis to it
+
+var zoomCallback = function(){
+    lastTransform = d3.event.transform; //save the transform for later inversion with clicks
+    d3.select('#points').attr("transform", d3.event.transform); //apply transform to g element containing circles
+    //recalculate the axes
+    d3.select('#x-axis').call(bottomAxis.scale(d3.event.transform.rescaleX(xScale)));
+    d3.select('#y-axis').call(leftAxis.scale(d3.event.transform.rescaleY(yScale)));
+}
+var zoom = d3.zoom().on('zoom', zoomCallback);
+d3.select('svg').call(zoom);

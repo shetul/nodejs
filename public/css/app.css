@@ -13,3 +13,7 @@ circle:hover{
   r:20;
   fill:blue;
 }
+/*text{
+  overflow:auto;
+  transform: rotate(-60deg);
+}*/
