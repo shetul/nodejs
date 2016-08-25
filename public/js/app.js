@@ -36,9 +36,10 @@ xScale.range([0, WIDTH]);
 xScale.domain([new Date('2016-1-1'), new Date('2017-1-1')]);
 //console.log(xScale(new Date('2016-7-1')));
 
-var render = function(){ d3.json('/runs', function(error, data){
+var render = function(){
+  d3.json('/runs', function(error, data){
   var circles = d3.select('#points').selectAll('circle').data(data, function(datum){
-      return datum.id;
+    return datum.id;
   });
   circles.enter()
     .append('circle')
@@ -64,54 +65,50 @@ var render = function(){ d3.json('/runs', function(error, data){
     d3.select(this).append('rectangle');
   });
 
+  //create the behavior
+  var drag = function(d){ //d is the data for the dragged object
+    var x = d3.event.x;
+    var y = d3.event.y;
+    d3.select(this).attr('cx', x);
+    d3.select(this).attr('cy', y);
+  }
 
-    //create the behavior
-    var drag = function(d){ //d is the data for the dragged object
-      var x = d3.event.x;
-      var y = d3.event.y;
-      d3.select(this).attr('cx', x);
-      d3.select(this).attr('cy', y);
-    }
+  var dragEnd = function(d){
+    var x = d3.event.x;
+    var y = d3.event.y;
+    var date = xScale.invert(x);
+    var distance = yScale.invert(y);
+    d.date = date;
+    d.distance = distance;
+    d3.request('/runs/'+d.id)
+      .header('Content-Type','application/json')
+      .send('PUT', JSON.stringify(d), render);
+  }
 
-    var dragEnd = function(d){
-      var x = d3.event.x;
-      var y = d3.event.y;
-      var date = xScale.invert(x);
-      var distance = yScale.invert(y);
-      d.date = date;
-      d.distance = distance;
-       d3.request('/runs/'+d.id)
-        .header('Content-Type','application/json')
-        .send('PUT', JSON.stringify(d), render);
-    }
+  var dragBehavior = d3.drag()
+    //.on('start', dragStart)
+    .on('drag', drag)
+    .on('end', dragEnd);
 
-    var dragBehavior = d3.drag()
-        //.on('start', dragStart)
-        .on('drag', drag)
-        .on('end', dragEnd);
-
-    d3.selectAll('circle').call(dragBehavior);
-
+  d3.selectAll('circle')
+    .call(dragBehavior);
   });
 };
 
 render();
 
 var lastTransform = null;
-
 d3.select('svg').on('click', function(){
   var x = d3.event.offsetX;
   var y = d3.event.offsetY;
 
-  if(lastTransform != null)
-  {
+  if(lastTransform != null){
     x = lastTransform.invertX(x);
     y = lastTransform.invertY(y);
   }
 
   var distance = yScale.invert(y);
   var date = xScale.invert(x);
-
   var runObject = {
     distance : distance,
     date : date
@@ -125,12 +122,13 @@ d3.select('svg').on('click', function(){
 })
 
 var leftAxis = d3.axisLeft(yScale); //create a left axis based on the yScale
+var bottomAxis = d3.axisBottom(xScale); //create a left axis based on the yScale
+
 d3.select('svg')
   .append('g') //append a group element
   .attr('id', 'y-axis')
   .call(leftAxis); //apply the axis to it
 
-var bottomAxis = d3.axisBottom(xScale); //create a left axis based on the yScale
 d3.select('svg')
   .append('g') //append a group element
 //  .select('#xAx')
@@ -139,11 +137,12 @@ d3.select('svg')
   .call(bottomAxis); //apply the axis to it
 
 var zoomCallback = function(){
-    lastTransform = d3.event.transform; //save the transform for later inversion with clicks
-    d3.select('#points').attr("transform", d3.event.transform); //apply transform to g element containing circles
-    //recalculate the axes
-    d3.select('#x-axis').call(bottomAxis.scale(d3.event.transform.rescaleX(xScale)));
-    d3.select('#y-axis').call(leftAxis.scale(d3.event.transform.rescaleY(yScale)));
+  lastTransform = d3.event.transform; //save the transform for later inversion with clicks
+  d3.select('#points').attr("transform", d3.event.transform); //apply transform to g element containing circles
+  //recalculate the axes
+  d3.select('#x-axis').call(bottomAxis.scale(d3.event.transform.rescaleX(xScale)));
+  d3.select('#y-axis').call(leftAxis.scale(d3.event.transform.rescaleY(yScale)));
 }
+
 var zoom = d3.zoom().on('zoom', zoomCallback);
 d3.select('svg').call(zoom);
