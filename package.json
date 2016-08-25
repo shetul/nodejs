@@ -20,7 +20,10 @@
     "body-parser": "^1.15.2",
     "ejs": "^2.5.1",
     "express": "^4.14.0",
+    "express-session": "^1.14.1",
+    "method-override": "^2.3.6",
     "pg": "^6.1.0",
+    "python": "0.0.4",
     "sequelize": "^3.24.1"
   }
 }

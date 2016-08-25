@@ -1,7 +1,8 @@
 var express = require('express');
+var bodyParser = require('body-parser');
 var controller = express.Router();
 var Runs = require('../models/runArray.js');
-
+controller.use(bodyParser.json());
 // index
 controller.get('/', function(req, res){
   Runs.findAll().then(function(totalRuns){
